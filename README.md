@@ -337,3 +337,5 @@ app.exec_()
 
 Ajay Randhawa
 
+[![Donate](https://raw.githubusercontent.com/ajayrandhawa/PyQt-Sqlite-Project-CURD/blob/master/Sc/donate.png)](https://www.paypal.me/ajayrandhawa)
+
