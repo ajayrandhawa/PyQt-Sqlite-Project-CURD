@@ -4,6 +4,7 @@ Pyqt SQLite Project Have Features like Add, Delete, Search, Update, Show the Stu
 # Features
 
 * Dashboard
+* Login
 * User list
 * Add User
 * Search User
