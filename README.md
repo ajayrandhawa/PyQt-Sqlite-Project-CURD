@@ -1,5 +1,5 @@
-# PyQt-Sqlite-Project-CURD
-Pyqt SQLite Project Have Features like Add, Delete, Search, Update, Show the Students. In this, I show all the CURD operations of the Program. All Project is well represented and with interactive Toolbar &amp; Menu bar. The database is included in the repository.
+# PyQt-Sqlite-Project-CURD  [![Donate](Sc/donate.png)](https://www.paypal.me/ajayrandhawa) 
+Pyqt SQLite Project Have Features like login, Add, Delete, Search, Update, Show the Students. In this, I show all the CURD operations of the Program. All Project is well represented and with interactive Toolbar &amp; Menu bar. The database is included in the repository.
 
 # Features
 
@@ -15,6 +15,7 @@ Pyqt SQLite Project Have Features like Add, Delete, Search, Update, Show the Stu
 
 | Screenshots  | Screenshots |
 | ------------- | ------------- |
+| <img src="/Sc/A.PNG"> | <img src="/Sc/B.PNG"> |
 | <img src="/Sc/A1.PNG"> | <img src="/Sc/A2.PNG"> |
 | <img src="/Sc/A3.PNG"> | <img src="/Sc/A4.PNG"> |
 
@@ -385,5 +386,5 @@ Ajay Randhawa
 ## Donate
 If you appreciate that, please consider donating to the Developer.
 
-[![Donate](Sc/donate.png)](https://www.paypal.me/ajayrandhawa)   [![Donate](Sc/donate.png)](https://www.paypal.me/ajayrandhawa)
+[![Donate](Sc/donate.png)](https://www.paypal.me/ajayrandhawa) 
 
