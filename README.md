@@ -180,13 +180,49 @@ class DeleteDialog(QDialog):
         except Exception:
             QMessageBox.warning(QMessageBox(), 'Error', 'Could not Delete student from the database.')
 
+class LoginDialog(QDialog):
+    def __init__(self, *args, **kwargs):
+        super(LoginDialog, self).__init__(*args, **kwargs)
+
+        self.setFixedWidth(300)
+        self.setFixedHeight(120)
+
+        layout = QVBoxLayout()
+
+        self.passinput = QLineEdit()
+        self.passinput.setEchoMode(QLineEdit.Password)
+        self.passinput.setPlaceholderText("Enter Password.")
+        self.QBtn = QPushButton()
+        self.QBtn.setText("Login")
+        self.setWindowTitle('Login')
+        self.QBtn.clicked.connect(self.login)
+
+        title = QLabel("Login")
+        font = title.font()
+        font.setPointSize(16)
+        title.setFont(font)
+
+        layout.addWidget(title)
+        layout.addWidget(self.passinput)
+        layout.addWidget(self.QBtn)
+        self.setLayout(layout)
+
+    def login(self):
+        if(self.passinput.text() == "Acet"):
+            self.accept()
+        else:
+            QMessageBox.warning(self, 'Error', 'Wrong Password')
+
+
+
+
 
 class AboutDialog(QDialog):
     def __init__(self, *args, **kwargs):
         super(AboutDialog, self).__init__(*args, **kwargs)
 
         self.setFixedWidth(300)
-        self.setFixedHeight(150)
+        self.setFixedHeight(250)
 
         QBtn = QDialogButtonBox.Ok  # No cancel
         self.buttonBox = QDialogButtonBox(QBtn)
@@ -200,10 +236,17 @@ class AboutDialog(QDialog):
         font.setPointSize(20)
         title.setFont(font)
 
+        labelpic = QLabel()
+        pixmap = QPixmap('icon/logo.png')
+        pixmap = pixmap.scaledToWidth(275)
+        labelpic.setPixmap(pixmap)
+        labelpic.setFixedHeight(150)
+
         layout.addWidget(title)
 
         layout.addWidget(QLabel("Version 5.3.2"))
         layout.addWidget(QLabel("Copyright 2018 CYB Inc."))
+        layout.addWidget(labelpic)
 
 
         layout.addWidget(self.buttonBox)
@@ -234,7 +277,7 @@ class MainWindow(QMainWindow):
         self.tableWidget.horizontalHeader().setCascadingSectionResizes(False)
         self.tableWidget.horizontalHeader().setSortIndicatorShown(False)
         self.tableWidget.horizontalHeader().setStretchLastSection(True)
-        self.tableWidget.verticalHeader().setVisible(True)
+        self.tableWidget.verticalHeader().setVisible(False)
         self.tableWidget.verticalHeader().setCascadingSectionResizes(False)
         self.tableWidget.verticalHeader().setStretchLastSection(False)
         self.tableWidget.setHorizontalHeaderLabels(("Roll No.", "Name", "Branch", "Sem", "Mobile","Address"))
@@ -324,11 +367,12 @@ class MainWindow(QMainWindow):
 
 
 app = QApplication(sys.argv)
-window = MainWindow()
-window.show()
-window.loaddata()
-app.exec_()
-
+passdlg = LoginDialog()
+if(passdlg.exec_() == QDialog.Accepted):
+    window = MainWindow()
+    window.show()
+    window.loaddata()
+sys.exit(app.exec_())
 ```
 
 ### Database Files are included in Project. (database.sql)
