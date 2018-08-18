@@ -31,11 +31,13 @@ import sys,sqlite3,time
 
 import os
 
+#Insert Dialog box where user can register the students.
+
 class InsertDialog(QDialog):
     def __init__(self, *args, **kwargs):
         super(InsertDialog, self).__init__(*args, **kwargs)
 
-        self.QBtn = QPushButton()
+        self.QBtn = QPushButton()   #create Push button
         self.QBtn.setText("Register")
 
         self.setWindowTitle("Add Student")
@@ -44,13 +46,13 @@ class InsertDialog(QDialog):
 
         self.QBtn.clicked.connect(self.addstudent)
 
-        layout = QVBoxLayout()
+        layout = QVBoxLayout()  #set verticle layout
 
         self.nameinput = QLineEdit()
         self.nameinput.setPlaceholderText("Name")
         layout.addWidget(self.nameinput)
 
-        self.branchinput = QComboBox()
+        self.branchinput = QComboBox() # create and add value to combobox
         self.branchinput.addItem("Mechanical")
         self.branchinput.addItem("Civil")
         self.branchinput.addItem("Electrical")
@@ -72,7 +74,7 @@ class InsertDialog(QDialog):
 
         self.mobileinput = QLineEdit()
         self.mobileinput.setPlaceholderText("Mobile")
-        self.mobileinput.setInputMask('99999 99999')
+        self.mobileinput.setInputMask('99999 99999') # set validator for user can only input interger input
         layout.addWidget(self.mobileinput)
 
         self.addressinput = QLineEdit()
@@ -81,6 +83,8 @@ class InsertDialog(QDialog):
 
         layout.addWidget(self.QBtn)
         self.setLayout(layout)
+
+# this function get value from all input box and insert these values in database.
 
     def addstudent(self):
 
