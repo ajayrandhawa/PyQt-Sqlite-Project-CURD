@@ -392,3 +392,5 @@ If you appreciate that, please consider donating to the Developer.
 
 [![Donate](Sc/donate.png)](https://www.paypal.me/ajayrandhawa) 
 
+### Happy Open Source
+
