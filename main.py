@@ -1,11 +1,6 @@
-from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
-from PyQt5.QtWebEngineWidgets import QWebEngineView
-from PyQt5.QtPrintSupport import *
-import sys,sqlite3,time
-
-import os
+import sys,sqlite3
 
 class InsertDialog(QDialog):
     def __init__(self, *args, **kwargs):
@@ -83,80 +78,97 @@ class InsertDialog(QDialog):
         except Exception:
             QMessageBox.warning(QMessageBox(), 'Error', 'Could not add student to the database.')
 
-class SearchDialog(QDialog):
-    def __init__(self, *args, **kwargs):
-        super(SearchDialog, self).__init__(*args, **kwargs)
+class UpdateDialog(QDialog):
+    def __init__(self, student_id, *args, **kwargs):
+        super(UpdateDialog, self).__init__(*args, **kwargs)
+
+        self.student_id = student_id
 
         self.QBtn = QPushButton()
-        self.QBtn.setText("Search")
+        self.QBtn.setText("Update")
 
-        self.setWindowTitle("Search user")
+        self.setWindowTitle("Update Student")
         self.setFixedWidth(300)
-        self.setFixedHeight(100)
-        self.QBtn.clicked.connect(self.searchstudent)
+        self.setFixedHeight(250)
+
+        self.QBtn.clicked.connect(self.updatestudent)
+
         layout = QVBoxLayout()
 
-        self.searchinput = QLineEdit()
-        self.onlyInt = QIntValidator()
-        self.searchinput.setValidator(self.onlyInt)
-        self.searchinput.setPlaceholderText("Roll No.")
-        layout.addWidget(self.searchinput)
+        self.nameinput = QLineEdit()
+        self.nameinput.setPlaceholderText("Name")
+        layout.addWidget(self.nameinput)
+
+        self.branchinput = QComboBox()
+        self.branchinput.addItem("Mechanical")
+        self.branchinput.addItem("Civil")
+        self.branchinput.addItem("Electrical")
+        self.branchinput.addItem("Electronics and Communication")
+        self.branchinput.addItem("Computer Science")
+        self.branchinput.addItem("Information Technology")
+        layout.addWidget(self.branchinput)
+
+        self.seminput = QComboBox()
+        self.seminput.addItem("1")
+        self.seminput.addItem("2")
+        self.seminput.addItem("3")
+        self.seminput.addItem("4")
+        self.seminput.addItem("5")
+        self.seminput.addItem("6")
+        self.seminput.addItem("7")
+        self.seminput.addItem("8")
+        layout.addWidget(self.seminput)
+
+        self.mobileinput = QLineEdit()
+        self.mobileinput.setPlaceholderText("Mobile")
+        self.mobileinput.setInputMask('99999 99999')
+        layout.addWidget(self.mobileinput)
+
+        self.addressinput = QLineEdit()
+        self.addressinput.setPlaceholderText("Address")
+        layout.addWidget(self.addressinput)
+
         layout.addWidget(self.QBtn)
         self.setLayout(layout)
 
-    def searchstudent(self):
+        # Populate fields with existing student data
+        self.populate_fields()
 
-        searchrol = ""
-        searchrol = self.searchinput.text()
+    def populate_fields(self):
         try:
             self.conn = sqlite3.connect("database.db")
             self.c = self.conn.cursor()
-            result = self.c.execute("SELECT * from students WHERE roll="+str(searchrol))
-            row = result.fetchone()
-            serachresult = "Rollno : "+str(row[0])+'\n'+"Name : "+str(row[1])+'\n'+"Branch : "+str(row[2])+'\n'+"Sem : "+str(row[3])+'\n'+"Address : "+str(row[4])
-            QMessageBox.information(QMessageBox(), 'Successful', serachresult)
-            self.conn.commit()
-            self.c.close()
+            self.c.execute("SELECT * FROM students WHERE roll=?", (self.student_id,))
+            student = self.c.fetchone()
             self.conn.close()
-        except Exception:
-            QMessageBox.warning(QMessageBox(), 'Error', 'Could not Find student from the database.')
 
-class DeleteDialog(QDialog):
-    def __init__(self, *args, **kwargs):
-        super(DeleteDialog, self).__init__(*args, **kwargs)
+            self.nameinput.setText(student[1])
+            self.branchinput.setCurrentText(student[2])
+            self.seminput.setCurrentText(str(student[3]))
+            self.mobileinput.setText(str(student[4]))
+            self.addressinput.setText(student[5])
+        except Exception as e:
+            QMessageBox.warning(QMessageBox(), 'Error', str(e))
 
-        self.QBtn = QPushButton()
-        self.QBtn.setText("Delete")
+    def updatestudent(self):
+        name = self.nameinput.text()
+        branch = self.branchinput.itemText(self.branchinput.currentIndex())
+        sem = self.seminput.itemText(self.seminput.currentIndex())
+        mobile = self.mobileinput.text()
+        address = self.addressinput.text()
 
-        self.setWindowTitle("Delete Student")
-        self.setFixedWidth(300)
-        self.setFixedHeight(100)
-        self.QBtn.clicked.connect(self.deletestudent)
-        layout = QVBoxLayout()
-
-        self.deleteinput = QLineEdit()
-        self.onlyInt = QIntValidator()
-        self.deleteinput.setValidator(self.onlyInt)
-        self.deleteinput.setPlaceholderText("Roll No.")
-        layout.addWidget(self.deleteinput)
-        layout.addWidget(self.QBtn)
-        self.setLayout(layout)
-
-    def deletestudent(self):
-
-        delrol = ""
-        delrol = self.deleteinput.text()
         try:
             self.conn = sqlite3.connect("database.db")
             self.c = self.conn.cursor()
-            self.c.execute("DELETE from students WHERE roll="+str(delrol))
+            self.c.execute("UPDATE students SET name=?, branch=?, sem=?, Mobile=?, address=? WHERE roll=?",
+                           (name, branch, sem, mobile, address, self.student_id))
             self.conn.commit()
             self.c.close()
             self.conn.close()
-            QMessageBox.information(QMessageBox(),'Successful','Deleted From Table Successful')
+            QMessageBox.information(QMessageBox(), 'Successful', 'Student is updated successfully to the database.')
             self.close()
         except Exception:
-            QMessageBox.warning(QMessageBox(), 'Error', 'Could not Delete student from the database.')
+            QMessageBox.warning(QMessageBox(), 'Error', 'Could not update student to the database.')
 
 class LoginDialog(QDialog):
     def __init__(self, *args, **kwargs):
@@ -169,6 +181,7 @@ class LoginDialog(QDialog):
 
         self.passinput = QLineEdit()
         self.passinput.setEchoMode(QLineEdit.Password)
+        self.passinput.setText("123456")
         self.passinput.setPlaceholderText("Enter Password.")
         self.QBtn = QPushButton()
         self.QBtn.setText("Login")
@@ -186,13 +199,10 @@ class LoginDialog(QDialog):
         self.setLayout(layout)
 
     def login(self):
-        if(self.passinput.text() == "Acet"):
+        if(self.passinput.text() == "123456"):
             self.accept()
         else:
             QMessageBox.warning(self, 'Error', 'Wrong Password')
-
-
-
 
 
 class AboutDialog(QDialog):
@@ -214,17 +224,10 @@ class AboutDialog(QDialog):
         font.setPointSize(20)
         title.setFont(font)
 
-        labelpic = QLabel()
-        pixmap = QPixmap('icon/logo.png')
-        pixmap = pixmap.scaledToWidth(275)
-        labelpic.setPixmap(pixmap)
-        labelpic.setFixedHeight(150)
-
         layout.addWidget(title)
 
-        layout.addWidget(QLabel("Version 5.3.2"))
-        layout.addWidget(QLabel("Copyright 2018 CYB Inc."))
-        layout.addWidget(labelpic)
+        layout.addWidget(QLabel("Version 1"))
+        layout.addWidget(QLabel("Copyright 2024 Ajay Randhawa."))
 
 
         layout.addWidget(self.buttonBox)
@@ -233,6 +236,7 @@ class AboutDialog(QDialog):
 
 
 class MainWindow(QMainWindow):
+
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
 
@@ -246,19 +250,20 @@ class MainWindow(QMainWindow):
         help_menu = self.menuBar().addMenu("&About")
         self.setWindowTitle("Student Management CRUD")
 
-        self.setMinimumSize(800, 600)
-
         self.tableWidget = QTableWidget()
         self.setCentralWidget(self.tableWidget)
         self.tableWidget.setAlternatingRowColors(True)
-        self.tableWidget.setColumnCount(6)
+        self.tableWidget.setColumnCount(7)
         self.tableWidget.horizontalHeader().setCascadingSectionResizes(False)
-        self.tableWidget.horizontalHeader().setSortIndicatorShown(False)
-        self.tableWidget.horizontalHeader().setStretchLastSection(True)
+        self.tableWidget.horizontalHeader().setSortIndicatorShown(True)
+        self.tableWidget.horizontalHeader().setStretchLastSection(False)  # Disable stretching for manual width
         self.tableWidget.verticalHeader().setVisible(False)
-        self.tableWidget.verticalHeader().setCascadingSectionResizes(False)
+        self.tableWidget.verticalHeader().setCascadingSectionResizes(True)
         self.tableWidget.verticalHeader().setStretchLastSection(False)
-        self.tableWidget.setHorizontalHeaderLabels(("Roll No.", "Name", "Branch", "Sem", "Mobile","Address"))
+        self.tableWidget.setHorizontalHeaderLabels(("Roll No.", "Name", "Branch", "Sem", "Mobile", "Address", "Action"))
+        self.tableWidget.horizontalHeader().setSectionResizeMode(5, QHeaderView.Stretch)
+        self.tableWidget.setColumnWidth(6, 120)
+
 
         toolbar = QToolBar()
         toolbar.setMovable(False)
@@ -277,28 +282,29 @@ class MainWindow(QMainWindow):
         btn_ac_refresh.setStatusTip("Refresh Table")
         toolbar.addAction(btn_ac_refresh)
 
-        btn_ac_search = QAction(QIcon("icon/search.png"), "Search", self)
-        btn_ac_search.triggered.connect(self.search)
-        btn_ac_search.setStatusTip("Search User")
-        toolbar.addAction(btn_ac_search)
+        self.search_input = QLineEdit()
+        self.search_input.setPlaceholderText("Search User with roll no. or name")
+        self.search_input.setFixedHeight(30)
+        self.search_input.setFixedWidth(400)
+        self.search_input.setContentsMargins(10, 0 ,0 , 0)
+        self.search_input.setTextMargins(3, 0, 3, 0)
+        toolbar.addWidget(self.search_input)
 
-        btn_ac_delete = QAction(QIcon("icon/trash.png"), "Delete", self)
-        btn_ac_delete.triggered.connect(self.delete)
-        btn_ac_delete.setStatusTip("Delete User")
-        toolbar.addAction(btn_ac_delete)
+        search_btn = QPushButton()
+        search_btn.setText("Search")
+        search_btn.setFixedHeight(30)
+        search_btn.clicked.connect(self.searchstudent)
+        toolbar.addWidget(search_btn)
+
+        clear_btn = QPushButton()
+        clear_btn.setText("Clear Search")
+        clear_btn.setFixedHeight(30)
+        clear_btn.clicked.connect(self.clearSearch)
+        toolbar.addWidget(clear_btn)
 
         adduser_action = QAction(QIcon("icon/add.png"),"Insert Student", self)
         adduser_action.triggered.connect(self.insert)
         file_menu.addAction(adduser_action)
-
-        searchuser_action = QAction(QIcon("icon/search.png"), "Search Student", self)
-        searchuser_action.triggered.connect(self.search)
-        file_menu.addAction(searchuser_action)
-
-        deluser_action = QAction(QIcon("icon/trash.png"), "Delete", self)
-        deluser_action.triggered.connect(self.delete)
-        file_menu.addAction(deluser_action)
-
 
         about_action = QAction(QIcon("icon/info.png"),"Developer", self)
         about_action.triggered.connect(self.about)
@@ -309,11 +315,123 @@ class MainWindow(QMainWindow):
         query = "SELECT * FROM students"
         result = self.connection.execute(query)
         self.tableWidget.setRowCount(0)
-        for row_number, row_data in enumerate(result):
-            self.tableWidget.insertRow(row_number)
-            for column_number, data in enumerate(row_data):
-                self.tableWidget.setItem(row_number, column_number,QTableWidgetItem(str(data)))
+
+        for inx, student in enumerate(result):
+
+            # Create a QWidget to hold the edit and delete buttons together
+            cell_widget = QWidget()
+            layout = QHBoxLayout(cell_widget)
+
+            editBtn = QPushButton(self.tableWidget)
+            editBtn.setIcon(QIcon("icon/editIcon.png"))
+            editBtn.setFixedWidth(50)
+
+            deleteBtn = QPushButton(self.tableWidget)
+            deleteBtn.setIcon(QIcon("icon/deleteIcon.png"))
+            deleteBtn.setFixedWidth(50)
+
+            # Connect buttons to the event handler with the student ID
+            editBtn.clicked.connect(lambda checked, student_id=student[0]: self.handleEdit(student_id))
+            deleteBtn.clicked.connect(lambda checked, student_id=student[0]: self.handleDelete(student_id))
+
+            layout.addWidget(editBtn)
+            layout.addWidget(deleteBtn)
+
+            # Set layout properties
+            layout.setContentsMargins(0, 0, 0, 0)  # Optional: adjust spacing as needed
+            cell_widget.setLayout(layout)
+
+            # Insert a new row at the index 'inx'
+            self.tableWidget.insertRow(inx)
+
+            # Populate the remaining columns with data from 'student'
+            self.tableWidget.setItem(inx, 0, QTableWidgetItem(str(student[0])))
+            self.tableWidget.setItem(inx, 1, QTableWidgetItem(str(student[1])))
+            self.tableWidget.setItem(inx, 2, QTableWidgetItem(str(student[2])))
+            self.tableWidget.setItem(inx, 3, QTableWidgetItem(str(student[3])))
+            self.tableWidget.setItem(inx, 4, QTableWidgetItem(str(student[4])))
+            self.tableWidget.setItem(inx, 5, QTableWidgetItem(str(student[5])))
+            # Set the delete button in the first column
+            self.tableWidget.setCellWidget(inx, 6, cell_widget)
+
+        # Optionally, update the table widget after loading all rows
+        self.tableWidget.update()
+
         self.connection.close()
+
+    # Define the event handler methods
+    def handleEdit(self, student_id):
+        print(student_id)
+        dlg = UpdateDialog(student_id)
+        dlg.exec_()
+        self.loaddata()
+
+    def clearSearch(self):
+        self.search_input.setText("")
+        self.loaddata()
+
+    def handleDelete(self, student_id):
+        try:
+            self.conn = sqlite3.connect("database.db")
+            self.c = self.conn.cursor()
+            self.c.execute("DELETE from students WHERE roll=" + str(student_id))
+            self.conn.commit()
+            self.c.close()
+            self.conn.close()
+            QMessageBox.information(QMessageBox(), 'Successful', 'Deleted From Table Successful')
+            self.loaddata()
+        except Exception:
+            QMessageBox.warning(QMessageBox(), 'Error', 'Could not Delete student from the database.')
+
+    def searchstudent(self):
+        query = self.search_input.text()
+        try:
+            self.conn = sqlite3.connect("database.db")
+            self.c = self.conn.cursor()
+            self.c.execute("SELECT * FROM students WHERE roll=? OR name LIKE ?", (query, '%' + query + '%'))
+            result = self.c.fetchall()
+            self.tableWidget.setRowCount(0)
+
+            for inx, student in enumerate(result):
+                cell_widget = QWidget()
+                layout = QHBoxLayout(cell_widget)
+
+                editBtn = QPushButton(self.tableWidget)
+                editBtn.setIcon(QIcon("icon/editIcon.png"))
+                editBtn.setFixedWidth(50)
+
+                deleteBtn = QPushButton(self.tableWidget)
+                deleteBtn.setIcon(QIcon("icon/deleteIcon.png"))
+                deleteBtn.setFixedWidth(50)
+
+                editBtn.clicked.connect(lambda _, student_id=student[0]: self.handleEdit(student[0]))
+                deleteBtn.clicked.connect(lambda _, student_id=student[0]: self.handleDelete(student[0]))
+
+                layout.addWidget(editBtn)
+                layout.addWidget(deleteBtn)
+
+                layout.setContentsMargins(0, 0, 0, 0)  # Optional: adjust spacing as needed
+                cell_widget.setLayout(layout)
+
+                self.tableWidget.insertRow(inx)
+                self.tableWidget.setItem(inx, 0, QTableWidgetItem(str(student[0])))
+                self.tableWidget.setItem(inx, 1, QTableWidgetItem(str(student[1])))
+                self.tableWidget.setItem(inx, 2, QTableWidgetItem(str(student[2])))
+                self.tableWidget.setItem(inx, 3, QTableWidgetItem(str(student[3])))
+                self.tableWidget.setItem(inx, 4, QTableWidgetItem(str(student[4])))
+                self.tableWidget.setItem(inx, 5, QTableWidgetItem(str(student[5])))
+                self.tableWidget.setCellWidget(inx, 6, cell_widget)
+
+            self.tableWidget.update()
+
+            self.conn.commit()
+            self.c.close()
+            self.conn.close()
+
+            if len(result) == 0:
+                QMessageBox.warning(QMessageBox(), 'Error', 'No results found.')
+        except Exception as e:
+            QMessageBox.warning(QMessageBox(), 'Error', str(e))
 
     def handlePaintRequest(self, printer):
         document = QTextDocument()
@@ -330,14 +448,7 @@ class MainWindow(QMainWindow):
     def insert(self):
         dlg = InsertDialog()
         dlg.exec_()
-
-    def delete(self):
-        dlg = DeleteDialog()
-        dlg.exec_()
-
-    def search(self):
-        dlg = SearchDialog()
-        dlg.exec_()
+        self.loaddata()
 
     def about(self):
         dlg = AboutDialog()
@@ -348,6 +459,7 @@ app = QApplication(sys.argv)
 passdlg = LoginDialog()
 if(passdlg.exec_() == QDialog.Accepted):
     window = MainWindow()
+    window.showMaximized()
     window.show()
     window.loaddata()
 sys.exit(app.exec_())
