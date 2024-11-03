@@ -13,7 +13,7 @@ Pyqt SQLite Project Have Features like login, Add, Delete, Search, Update, Show 
 
 ## Screenshot
 
-<img src="Sc/screenshot.png" />
+<img src="Sc/view.png" />
 
 ### Database Files are included in Project. (database.sql)
 
